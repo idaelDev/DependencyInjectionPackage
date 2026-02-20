@@ -1,0 +1,16 @@
+{
+    "name": "IdaelDev.DependencyInjection.Examples.LifeTimes",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9a5514540023d404182f9b48c97468bd"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
