@@ -1,29 +1,29 @@
-# Système d'Injection de Dépendances pour Unity
+# Dependency Injection System for Unity
 
-Un système d'IoC (Inversion of Control) Container complet pour Unity avec support de l'injection de dépendances, des cycles de vie multiples, de l'asynchrone et des scopes.
+A complete IoC (Inversion of Control) Container system for Unity with support for dependency injection, multiple lifetimes, asynchronous operations, and scopes.
 
-## 🚀 Fonctionnalités
+## Features
 
-- ✅ **Injection par constructeur** - Résolution automatique des dépendances
-- ✅ **Injection par propriété** - Avec l'attribut `[Inject]`
-- ✅ **Injection asynchrone** - Support des dépendances async avec `[InjectAsync]`
-- ✅ **Cycles de vie multiples** - Singleton, Transient, Scoped
-- ✅ **Résolution en cascade** - Gestion automatique des dépendances imbriquées
-- ✅ **Détection de cycles** - Prévention des dépendances circulaires
-- ✅ **Scopes temporaires** - Pour des IoC containers isolés
-- ✅ **Injection automatique au runtime** - GameObjects instanciés dynamiquement
-- ✅ **Extensions Unity** - Méthodes pratiques pour Instantiate, AddComponent, etc.
-- ✅ **Support MonoBehaviour** - Injection dans les composants Unity
+- **Constructor Injection** - Automatic dependency resolution  
+- **Property Injection** - Using the `[Inject]` attribute  
+- **Asynchronous Injection** - Support for async dependencies with `[InjectAsync]`  
+- **Multiple Lifetimes** - Singleton, Transient, Scoped  
+- **Cascading Resolution** - Automatic handling of nested dependencies  
+- **Cycle Detection** - Prevention of circular dependencies  
+- **Temporary Scopes** - For isolated IoC containers  
+- **Automatic Runtime Injection** - Dynamically instantiated GameObjects  
+- **Unity Extensions** - Convenient methods for Instantiate, AddComponent, etc.  
+- **MonoBehaviour Support** - Injection into Unity components  
 
-## 📦 Installation
+## Installation
 
-1. Copiez le dossier `DependencyInjection` dans votre projet Unity
-2. Créez une classe héritant de `DIContext` pour configurer vos services
-3. Ajoutez votre contexte à un GameObject dans votre scène
+1. Copy the `DependencyInjection` folder into your Unity project  
+2. Create a class inheriting from `DIContext` to configure your services  
+3. Add your context to a GameObject in your scene  
 
-## 🎯 Utilisation Rapide
+## Quick Start
 
-### 1. Créer votre contexte DI
+### 1. Create Your DI Context
 
 ```csharp
 using DependencyInjection;
@@ -33,17 +33,17 @@ public class MyGameContext : DIContext
 {
     protected override void ConfigureServices(DIContainer container)
     {
-        // Singleton - partagé dans toute l'application
+        // Singleton - shared across the entire application
         container.Register<ILogger, ConsoleLogger>(Lifetime.Singleton);
         container.Register<IGameManager, GameManager>(Lifetime.Singleton);
 
-        // Transient - nouvelle instance à chaque résolution
+        // Transient - new instance on each resolution
         container.Register<IWeaponFactory, WeaponFactory>(Lifetime.Transient);
 
-        // Scoped - une instance par scope
+        // Scoped - one instance per scope
         container.Register<IDatabaseTransaction, DatabaseTransaction>(Lifetime.Scoped);
 
-        // Factory personnalisée
+        // Custom factory
         container.RegisterFactory<IConfig>(c => 
             new Config { Level = 10 }, 
             Lifetime.Singleton
@@ -52,16 +52,14 @@ public class MyGameContext : DIContext
 }
 ```
 
-### 2. Définir vos services
+### 2. Define Your Services
 
 ```csharp
-// Interface
 public interface ILogger
 {
     void Log(string message);
 }
 
-// Implémentation avec injection par constructeur
 public class ConsoleLogger : ILogger
 {
     public void Log(string message)
@@ -70,13 +68,11 @@ public class ConsoleLogger : ILogger
     }
 }
 
-// Service avec dépendances
 public class GameManager : IGameManager
 {
     private readonly ILogger _logger;
     private readonly IWeaponFactory _weaponFactory;
 
-    // Le constructeur avec [Inject] sera utilisé pour la résolution
     [Inject]
     public GameManager(ILogger logger, IWeaponFactory weaponFactory)
     {
@@ -91,12 +87,11 @@ public class GameManager : IGameManager
 }
 ```
 
-### 3. Injection dans les MonoBehaviour
+### 3. Injection in MonoBehaviour
 
 ```csharp
 public class PlayerController : MonoBehaviour
 {
-    // Injection par propriété
     [Inject] 
     public ILogger Logger { get; set; }
 
@@ -111,7 +106,7 @@ public class PlayerController : MonoBehaviour
 }
 ```
 
-### 4. Injection asynchrone
+### 4. Asynchronous Injection
 
 ```csharp
 public class AsyncDataLoader : MonoBehaviour
@@ -121,7 +116,6 @@ public class AsyncDataLoader : MonoBehaviour
 
     private string _loadedData;
 
-    // Méthode appelée automatiquement après l'injection
     [InjectAsync]
     private async Task InitializeAsync(IDataService dataService)
     {
@@ -132,90 +126,82 @@ public class AsyncDataLoader : MonoBehaviour
 }
 ```
 
-## 🔄 Cycles de Vie
+## Lifecycles
 
 ### Singleton
-Une seule instance créée et partagée dans toute l'application.
+
+A single instance created and shared across the entire application.
 
 ```csharp
 container.Register<ILogger, ConsoleLogger>(Lifetime.Singleton);
 ```
 
 ### Transient
-Une nouvelle instance est créée à chaque résolution.
+
+A new instance is created on each resolution.
 
 ```csharp
 container.Register<IWeapon, Sword>(Lifetime.Transient);
 ```
 
 ### Scoped
-Une instance par scope. Utile pour des opérations temporaires ou des transactions.
+
+One instance per scope. Useful for temporary operations or transactions.
 
 ```csharp
 container.Register<ITransaction, Transaction>(Lifetime.Scoped);
 
-// Utilisation
 using (var scope = DIContext.Instance.CreateScope())
 {
     var transaction = scope.Resolve<ITransaction>();
     transaction.Begin();
-    // ...
     transaction.Commit();
-} // Dispose automatique des services Scoped
+}
 ```
 
-## 🎮 Instanciation Runtime
+## Runtime Instantiation
 
-### Méthode 1: Composant AutoInject (Recommandé)
+### Method 1: AutoInject Component (Recommended)
 
-Ajoutez le composant `AutoInject` sur vos prefabs :
+Add the `AutoInject` component to your prefabs:
 
 ```csharp
-// Sur votre prefab, cochez les options dans l'inspecteur
+// On your prefab, enable options in the inspector
 // - Inject On Awake: true
-// - Inject Children: false (ou true pour injecter aussi les enfants)
-// - Use Async: false (ou true si vous avez des dépendances async)
+// - Inject Children: false
+// - Use Async: false
 
 GameObject instance = Instantiate(myPrefab);
-// Les dépendances sont automatiquement injectées !
+// Dependencies are automatically injected
 ```
 
-### Méthode 2: Extensions Unity
+### Method 2: Unity Extensions
 
 ```csharp
-// Instanciation avec injection automatique
 GameObject player = playerPrefab.InstantiateWithInjection();
 GameObject enemy = enemyPrefab.InstantiateWithInjection(position, rotation);
 GameObject item = itemPrefab.InstantiateWithInjection(parent);
 
-// Ajouter un composant avec injection
 var controller = gameObject.AddComponentWithInjection<PlayerController>();
 
-// Injecter manuellement dans un objet existant
 existingObject.InjectDependencies();
 ```
 
-### Méthode 3: Injection manuelle
+### Method 3: Manual Injection
 
 ```csharp
 GameObject instance = Instantiate(myPrefab);
 DIContext.Container.InjectGameObject(instance);
 ```
 
-## 🔗 Dépendances en Cascade
-
-Le système résout automatiquement les dépendances imbriquées dans le bon ordre :
+## Cascading Dependencies
 
 ```csharp
-// ProfileService dépend de UserService
-// UserService dépend de AuthService  
-// AuthService dépend de Logger
-
 public class ProfileService : IProfileService
 {
     private readonly IUserService _userService;
     
-    public ProfileService(IUserService userService) // ← UserService sera résolu
+    public ProfileService(IUserService userService)
     {
         _userService = userService;
     }
@@ -225,23 +211,19 @@ public class UserService : IUserService
 {
     private readonly IAuthService _authService;
     
-    public UserService(IAuthService authService) // ← AuthService sera résolu
+    public UserService(IAuthService authService)
     {
         _authService = authService;
     }
 }
 
-// Dans votre MonoBehaviour
 [Inject]
-public IProfileService ProfileService { get; set; } // ← Tout est résolu automatiquement !
+public IProfileService ProfileService { get; set; }
 ```
 
-## 🛡️ Détection de Cycles
-
-Le système détecte automatiquement les dépendances circulaires :
+## Cycle Detection
 
 ```csharp
-// ❌ Ceci lancera une exception
 public class ServiceA
 {
     public ServiceA(ServiceB b) { }
@@ -249,13 +231,11 @@ public class ServiceA
 
 public class ServiceB
 {
-    public ServiceB(ServiceA a) { } // Cycle détecté !
+    public ServiceB(ServiceA a) { }
 }
 ```
 
-## 🎯 Scopes Avancés
-
-Utilisez les scopes pour isoler des opérations :
+## Advanced Scopes
 
 ```csharp
 public class DatabaseManager : MonoBehaviour
@@ -267,7 +247,6 @@ public class DatabaseManager : MonoBehaviour
     {
         using (var scope = DIContext.Instance.CreateScope())
         {
-            // Services Scoped = une instance par scope
             var transaction = scope.Resolve<IDatabaseTransaction>();
             var validator = scope.Resolve<IDataValidator>();
             
@@ -275,32 +254,28 @@ public class DatabaseManager : MonoBehaviour
             
             try
             {
-                // Travail avec la transaction...
                 transaction.Commit();
             }
             catch
             {
                 transaction.Rollback();
             }
-        } // Dispose automatique
+        }
     }
 }
 ```
 
-## 📝 Bonnes Pratiques
+## Best Practices
 
-### 1. Utilisez des interfaces
+### 1. Use Interfaces
+
 ```csharp
-// ✅ Bon
 container.Register<ILogger, ConsoleLogger>(Lifetime.Singleton);
-
-// ❌ À éviter (couplage fort)
-container.Register<ConsoleLogger>(Lifetime.Singleton);
 ```
 
-### 2. Préférez l'injection par constructeur
+### 2. Prefer Constructor Injection
+
 ```csharp
-// ✅ Bon - dépendances explicites
 public class GameManager
 {
     private readonly ILogger _logger;
@@ -310,120 +285,109 @@ public class GameManager
         _logger = logger;
     }
 }
-
-// ⚠️ Acceptable pour MonoBehaviour uniquement
-public class PlayerController : MonoBehaviour
-{
-    [Inject] public ILogger Logger { get; set; }
-}
 ```
 
-### 3. Utilisez Singleton pour les services stateless
+### 3. Use Singleton for Stateless Services
+
 ```csharp
-// Services sans état partagé = Singleton
-container.Register<ILogger, ConsoleLogger>(Lifetime.Singleton);
 container.Register<IEventBus, EventBus>(Lifetime.Singleton);
 ```
 
-### 4. Utilisez Transient pour les objets avec état
+### 4. Use Transient for Stateful Objects
+
 ```csharp
-// Objets avec état spécifique = Transient
 container.Register<ICommand, AttackCommand>(Lifetime.Transient);
-container.Register<IWeapon, Sword>(Lifetime.Transient);
 ```
 
-### 5. Utilisez Scoped pour les transactions
+### 5. Use Scoped for Transactions
+
 ```csharp
-// Opérations temporaires = Scoped
 container.Register<IDatabaseTransaction, Transaction>(Lifetime.Scoped);
-container.Register<IHttpRequest, HttpRequest>(Lifetime.Scoped);
 ```
 
-## 🔍 Résolution Manuelle
+## Manual Resolution
 
 ```csharp
-// Résoudre un service manuellement
 var logger = DIContext.Container.Resolve<ILogger>();
 
-// Résolution asynchrone
 var dataService = await DIContext.Container.ResolveAsync<IDataService>();
 ```
 
-## ⚙️ Configuration du DIContext
+## DIContext Configuration
 
 ```csharp
 public class MyGameContext : DIContext
 {
-    // Inspecter ces paramètres dans Unity
     [SerializeField] private bool _dontDestroyOnLoad = true;
     [SerializeField] private bool _injectOnAwake = true;
 
     protected override void ConfigureServices(DIContainer container)
     {
-        // Enregistrez tous vos services ici
         container.Register<ILogger, ConsoleLogger>(Lifetime.Singleton);
-        
-        // ...
     }
 }
 ```
 
-## 🧪 Exemple Complet
+## Complete Example
 
-Voir le fichier `Examples/ExampleUsage.cs` pour des exemples complets incluant :
-- Services simples et avec dépendances
-- Injection asynchrone
-- Scopes
-- Instanciation runtime
-- Dépendances en cascade
-- Transactions
+See `Examples/ExampleUsage.cs` for full examples including:
+- Simple services and services with dependencies  
+- Asynchronous injection  
+- Scopes  
+- Runtime instantiation  
+- Cascading dependencies  
+- Transactions  
 
-## 📋 API Référence
+## API Reference
 
 ### DIContainer
 
-| Méthode | Description |
-|---------|-------------|
-| `Register<TInterface, TImpl>(Lifetime)` | Enregistre un service |
-| `RegisterInstance<T>(instance)` | Enregistre une instance existante |
-| `RegisterFactory<T>(factory, Lifetime)` | Enregistre avec une factory |
-| `Resolve<T>()` | Résout un service |
-| `ResolveAsync<T>()` | Résout avec injection async |
-| `CreateScope()` | Crée un nouveau scope |
-| `InjectGameObject(GameObject)` | Injecte dans un GameObject |
-| `InjectComponent(MonoBehaviour)` | Injecte dans un composant |
+| Method | Description |
+|--------|-------------|
+| `Register<TInterface, TImpl>(Lifetime)` | Registers a service |
+| `RegisterInstance<T>(instance)` | Registers an existing instance |
+| `RegisterFactory<T>(factory, Lifetime)` | Registers with a factory |
+| `Resolve<T>()` | Resolves a service |
+| `ResolveAsync<T>()` | Resolves with async injection |
+| `CreateScope()` | Creates a new scope |
+| `InjectGameObject(GameObject)` | Injects into a GameObject |
+| `InjectComponent(MonoBehaviour)` | Injects into a component |
 
-### Attributs
+### Attributes
 
-| Attribut | Utilisation |
-|----------|-------------|
-| `[Inject]` | Propriété ou constructeur à injecter |
-| `[InjectAsync]` | Méthode d'initialisation async |
+| Attribute | Usage |
+|-----------|--------|
+| `[Inject]` | Property or constructor to inject |
+| `[InjectAsync]` | Async initialization method |
 
-### Extensions Unity
+### Unity Extensions
 
-| Méthode | Description |
-|---------|-------------|
-| `InstantiateWithInjection()` | Instantie avec injection auto |
-| `AddComponentWithInjection<T>()` | Ajoute un composant avec injection |
-| `InjectDependencies()` | Injecte dans un objet existant |
+| Method | Description |
+|--------|-------------|
+| `InstantiateWithInjection()` | Instantiates with automatic injection |
+| `AddComponentWithInjection<T>()` | Adds a component with injection |
+| `InjectDependencies()` | Injects into an existing object |
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
-### "Service not registered"
-Assurez-vous d'avoir enregistré le service dans `ConfigureServices()`.
+### Service not registered
 
-### "Circular dependency detected"
-Revoyez votre architecture - utilisez des événements ou le pattern Mediator.
+Make sure you registered the service in `ConfigureServices()`.
 
-### "DIContext.Container is null"
-Vérifiez que DIContext est bien dans la scène et initialisé avant utilisation.
+### Circular dependency detected
 
-### Les dépendances ne sont pas injectées
-- Vérifiez que l'attribut `[Inject]` est présent
-- Pour les GameObjects runtime, utilisez `AutoInject` ou les extensions
-- Assurez-vous que `InjectOnAwake` est activé dans DIContext
+Review your architecture and use events or the Mediator pattern.
 
-## 📄 Licence
+### DIContext.Container is null
 
-Libre d'utilisation pour vos projets Unity personnels et commerciaux.
+Make sure DIContext is in the scene and initialized before use.
+
+### Dependencies are not injected
+
+- Make sure the `[Inject]` attribute is present  
+- For runtime GameObjects, use `AutoInject` or the extensions  
+- Ensure `InjectOnAwake` is enabled in DIContext  
+
+## License
+
+Free to use for your personal and commercial Unity projects.
