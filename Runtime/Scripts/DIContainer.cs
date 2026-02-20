@@ -9,9 +9,9 @@ namespace DependencyInjection
 {
     public enum Lifetime
     {
-        Transient,  // Nouvelle instance à chaque fois
-        Singleton,  // Une seule instance partagée
-        Scoped      // Une instance par scope
+        Singleton, // Une seule instance partagée
+        Transient, // Nouvelle instance à chaque fois
+        Scoped // Une instance par scope
     }
 
     public class DIContainer : IDisposable
@@ -22,7 +22,7 @@ namespace DependencyInjection
         private readonly HashSet<Type> _resolvingTypes = new();
         private readonly HashSet<object> _asyncInitializedObjects = new();
         private readonly DIContainer _parentContainer;
-        private bool _isScope;
+        private readonly bool _isScope;
         private bool _isDisposed;
 
         public DIContainer()
@@ -55,11 +55,12 @@ namespace DependencyInjection
             return Register(typeof(TImplementation), typeof(TImplementation), lifetime);
         }
 
-        public DIContainer Register(Type serviceType, Type implementationType, Lifetime lifetime = Lifetime.Transient)
+        private DIContainer Register(Type serviceType, Type implementationType, Lifetime lifetime = Lifetime.Transient)
         {
             if (_isScope)
             {
-                throw new InvalidOperationException("Cannot register services in a scoped container. Register in the root container.");
+                throw new InvalidOperationException(
+                    "Cannot register services in a scoped container. Register in the root container.");
             }
 
             _services[serviceType] = new ServiceDescriptor
@@ -77,7 +78,8 @@ namespace DependencyInjection
         {
             if (_isScope)
             {
-                throw new InvalidOperationException("Cannot register instances in a scoped container. Register in the root container.");
+                throw new InvalidOperationException(
+                    "Cannot register instances in a scoped container. Register in the root container.");
             }
 
             _services[typeof(TInterface)] = new ServiceDescriptor
@@ -92,11 +94,13 @@ namespace DependencyInjection
             return this;
         }
 
-        public DIContainer RegisterFactory<TInterface>(Func<DIContainer, TInterface> factory, Lifetime lifetime = Lifetime.Transient)
+        public DIContainer RegisterFactory<TInterface>(Func<DIContainer, TInterface> factory,
+            Lifetime lifetime = Lifetime.Transient)
         {
             if (_isScope)
             {
-                throw new InvalidOperationException("Cannot register factories in a scoped container. Register in the root container.");
+                throw new InvalidOperationException(
+                    "Cannot register factories in a scoped container. Register in the root container.");
             }
 
             _services[typeof(TInterface)] = new ServiceDescriptor
@@ -119,7 +123,7 @@ namespace DependencyInjection
             return (T)Resolve(typeof(T));
         }
 
-        public object Resolve(Type serviceType)
+        private object Resolve(Type serviceType)
         {
             if (_isDisposed)
             {
@@ -141,6 +145,7 @@ namespace DependencyInjection
                 {
                     return _parentContainer.Resolve(serviceType);
                 }
+
                 throw new InvalidOperationException(
                     $"Service of type '{serviceType.FullName}' is not registered. " +
                     $"Make sure to call container.Register<{serviceType.Name}>() in ConfigureServices.");
@@ -168,7 +173,7 @@ namespace DependencyInjection
             return (T)await ResolveAsync(typeof(T));
         }
 
-        public async Task<object> ResolveAsync(Type serviceType)
+        private async Task<object> ResolveAsync(Type serviceType)
         {
             var instance = Resolve(serviceType);
 
@@ -189,7 +194,7 @@ namespace DependencyInjection
         {
             // Vérifier d'abord dans le root container
             var rootContainer = GetRootContainer();
-            
+
             if (rootContainer._singletonInstances.TryGetValue(descriptor.ServiceType, out var instance))
             {
                 return instance;
@@ -233,17 +238,18 @@ namespace DependencyInjection
                 var constructor = GetBestConstructor(descriptor.ImplementationType);
                 var parameters = constructor.GetParameters();
                 var parameterInstances = new object[parameters.Length];
-
+                var dependencies = new List<Type>();
                 for (int i = 0; i < parameters.Length; i++)
                 {
                     parameterInstances[i] = Resolve(parameters[i].ParameterType);
+                    dependencies.Add(parameters[i].ParameterType);
                 }
 
                 var instance = Activator.CreateInstance(descriptor.ImplementationType, parameterInstances);
 
                 // Injecter les propriétés
                 InjectProperties(instance);
-
+                TrackInstance(instance, descriptor, dependencies);
                 return instance;
             }
             finally
@@ -293,6 +299,7 @@ namespace DependencyInjection
             }
 
             var type = instance.GetType();
+            var injectedDependencies = new List<Type>();
 
             // Injecter les propriétés
             var properties = type
@@ -303,7 +310,8 @@ namespace DependencyInjection
             {
                 if (!property.CanWrite)
                 {
-                    Debug.LogWarning($"Property '{property.Name}' on type '{type.Name}' has [Inject] but is read-only. Skipping.");
+                    Debug.LogWarning(
+                        $"Property '{property.Name}' on type '{type.Name}' has [Inject] but is read-only. Skipping.");
                     continue;
                 }
 
@@ -311,6 +319,7 @@ namespace DependencyInjection
                 {
                     var value = Resolve(property.PropertyType);
                     property.SetValue(instance, value);
+                    injectedDependencies.Add(property.PropertyType);
                 }
                 catch (Exception ex)
                 {
@@ -328,7 +337,8 @@ namespace DependencyInjection
             {
                 if (field.IsInitOnly)
                 {
-                    Debug.LogWarning($"Field '{field.Name}' on type '{type.Name}' has [Inject] but is readonly. Skipping.");
+                    Debug.LogWarning(
+                        $"Field '{field.Name}' on type '{type.Name}' has [Inject] but is readonly. Skipping.");
                     continue;
                 }
 
@@ -336,12 +346,18 @@ namespace DependencyInjection
                 {
                     var value = Resolve(field.FieldType);
                     field.SetValue(instance, value);
+                    injectedDependencies.Add(field.FieldType);
                 }
                 catch (Exception ex)
                 {
                     Debug.LogError($"Failed to inject field '{field.Name}' on type '{type.Name}': {ex.Message}");
                     throw;
                 }
+            }
+
+            if (instance is MonoBehaviour && injectedDependencies.Count > 0)
+            {
+                TrackSceneInstance(instance, type); // ← AJOUT
             }
         }
 
@@ -364,7 +380,7 @@ namespace DependencyInjection
                 for (int i = 0; i < parameters.Length; i++)
                 {
                     // Utiliser Resolve normal ici pour éviter la récursion
-                    parameterInstances[i] = Resolve(parameters[i].ParameterType);
+                    parameterInstances[i] = await ResolveAsync(parameters[i].ParameterType);
                 }
 
                 try
@@ -391,7 +407,13 @@ namespace DependencyInjection
 
         public DIContainer CreateScope()
         {
-            return new DIContainer(GetRootContainer());
+            var scope = new DIContainer(GetRootContainer());
+
+#if UNITY_EDITOR
+            DIContainerTracker.Instance.RegisterScope(scope);
+#endif
+
+            return scope;
         }
 
         private DIContainer GetRootContainer()
@@ -401,6 +423,7 @@ namespace DependencyInjection
             {
                 current = current._parentContainer;
             }
+
             return current;
         }
 
@@ -412,7 +435,12 @@ namespace DependencyInjection
             }
 
             _isDisposed = true;
-
+#if UNITY_EDITOR
+            if (_isScope)
+            {
+                DIContainerTracker.Instance.CleanupScope(this);
+            }
+            #endif
             if (_isScope)
             {
                 // Disposer les instances scoped
@@ -430,6 +458,7 @@ namespace DependencyInjection
                         }
                     }
                 }
+
                 _scopedInstances.Clear();
             }
             else
@@ -449,6 +478,7 @@ namespace DependencyInjection
                         }
                     }
                 }
+
                 _singletonInstances.Clear();
             }
 
@@ -504,7 +534,7 @@ namespace DependencyInjection
         /// <summary>
         /// Vérifie si un service est enregistré
         /// </summary>
-        public bool IsRegistered(Type serviceType)
+        private bool IsRegistered(Type serviceType)
         {
             if (_services.ContainsKey(serviceType))
             {
@@ -520,7 +550,7 @@ namespace DependencyInjection
         public IEnumerable<Type> GetRegisteredServices()
         {
             var services = new HashSet<Type>(_services.Keys);
-            
+
             if (_parentContainer != null)
             {
                 foreach (var service in _parentContainer.GetRegisteredServices())
@@ -547,11 +577,11 @@ namespace DependencyInjection
                     var members = type
                         .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                         .Where(p => p.GetCustomAttribute<InjectAttribute>() != null)
-                        .Select(p => new { Type = p.PropertyType, Name = p.Name })
+                        .Select(p => new { Type = p.PropertyType, p.Name })
                         .Concat(
                             type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                            .Where(f => f.GetCustomAttribute<InjectAttribute>() != null)
-                            .Select(f => new { Type = f.FieldType, Name = f.Name })
+                                .Where(f => f.GetCustomAttribute<InjectAttribute>() != null)
+                                .Select(f => new { Type = f.FieldType, f.Name })
                         );
 
                     foreach (var member in members)
@@ -571,7 +601,8 @@ namespace DependencyInjection
                     {
                         if (!IsRegistered(param.ParameterType))
                         {
-                            error = $"Dependency '{param.ParameterType.Name}' for parameter '{param.Name}' is not registered";
+                            error =
+                                $"Dependency '{param.ParameterType.Name}' for parameter '{param.Name}' is not registered";
                             return false;
                         }
                     }
@@ -584,6 +615,61 @@ namespace DependencyInjection
                 error = ex.Message;
                 return false;
             }
+        }
+
+        #endregion
+
+        #region Tracking
+
+        /// <summary>
+        /// Enregistre une instance dans le tracker pour le monitoring
+        /// </summary>
+        private void TrackInstance(object instance, ServiceDescriptor descriptor, List<Type> dependencies = null)
+        {
+            if (instance == null) return;
+
+#if UNITY_EDITOR
+            try
+            {
+                DIContainerTracker.Instance.RegisterInstance(
+                    instance,
+                    descriptor.ServiceType,
+                    descriptor.ImplementationType,
+                    descriptor.Lifetime,
+                    this,
+                    dependencies
+                );
+            }
+            catch
+            {
+                // Ignore tracking errors in production
+            }
+            #endif
+        }
+
+        /// <summary>
+        /// Enregistre une instance de scène dans le tracker
+        /// </summary>
+        private void TrackSceneInstance(object instance, Type implementationType)
+        {
+#if UNITY_EDITOR
+            try
+            {
+                DIContainerTracker.Instance.RegisterInstance(
+                    instance,
+                    implementationType,
+                    implementationType,
+                    Lifetime.Singleton, // Scene objects are treated as singletons
+                    this,
+                    null,
+                    true // isFromScene
+                );
+            }
+            catch
+            {
+                // Ignore tracking errors
+            }
+#endif
         }
 
         #endregion

@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace DependencyInjection.Examples._06_RuntimeInstantiation
+namespace DependencyInjection.Samples._06_RuntimeInstantiation
 {
     public class RuntimeInstantiationTest : MonoBehaviour
     {
@@ -33,7 +33,7 @@ namespace DependencyInjection.Examples._06_RuntimeInstantiation
         {
             if (prefabWithAutoInject != null)
             {
-                var obj = prefabWithAutoInject.InstantiateWithInjection();
+                prefabWithAutoInject.InstantiateWithInjection();
                 _logger?.Log("Prefab spawned with injection");
             }
         }

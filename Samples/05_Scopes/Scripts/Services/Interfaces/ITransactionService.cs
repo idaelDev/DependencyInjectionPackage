@@ -1,4 +1,4 @@
-﻿namespace DependencyInjection.Examples._05_Scopes
+﻿namespace DependencyInjection.Samples._05_Scopes
 {
     public interface ITransactionService : System.IDisposable
     {

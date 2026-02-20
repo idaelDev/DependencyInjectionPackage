@@ -1,6 +1,7 @@
 using UnityEngine;
+using ILogger = DependencyInjection.Samples._04_Lifetimes.ILogger;
 
-namespace DependencyInjection.Examples._04_Lifetimes
+namespace DependencyInjection.Samples._04_Lifetimes
 {
     public class LifetimesContext : DIContext
     {

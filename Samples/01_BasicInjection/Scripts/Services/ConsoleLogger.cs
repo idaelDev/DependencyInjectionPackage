@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection.Examples._01_BasicInjection
+namespace DependencyInjection.Samples._01_BasicInjection
 {
     public class ConsoleLogger : ILogger
     {
@@ -11,7 +11,7 @@ namespace DependencyInjection.Examples._01_BasicInjection
         {
         }
 
-        public ConsoleLogger(string prefix)
+        private ConsoleLogger(string prefix)
         {
             _prefix = prefix;
             Log("Logger initialized");

@@ -1,6 +1,6 @@
 {
     "name": "IdaelDev.Dependencyinjection",
-    "rootNamespace": "",
+    "rootNamespace": "DependencyInjection",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

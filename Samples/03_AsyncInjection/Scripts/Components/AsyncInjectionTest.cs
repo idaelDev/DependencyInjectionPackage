@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace DependencyInjection.Examples._03_AsyncInjection
+namespace DependencyInjection.Samples._03_AsyncInjection
 {
     public class AsyncInjectionTest : MonoBehaviour
     {

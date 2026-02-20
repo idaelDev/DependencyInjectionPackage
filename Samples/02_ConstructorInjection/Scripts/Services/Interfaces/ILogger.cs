@@ -1,4 +1,4 @@
-﻿namespace DependencyInjection.Examples._02_ConstructorInjection
+﻿namespace DependencyInjection.Samples._02_ConstructorInjection
 {
     public interface ILogger
     {

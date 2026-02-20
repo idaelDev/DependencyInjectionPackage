@@ -1,10 +1,12 @@
 {
-    "name": "IdaelDev.DependencyInjection.Examples.LifeTimes",
-    "rootNamespace": "DependencyInjection",
+    "name": "IdaelDev.Dependencyinjection.Editor",
+    "rootNamespace": "DependencyInjection.Editor",
     "references": [
         "GUID:9a5514540023d404182f9b48c97468bd"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

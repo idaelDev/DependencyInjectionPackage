@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection.Examples._07_CascadeDependencies
+namespace DependencyInjection.Samples._07_CascadeDependencies
 {
     public class CascadeDependenciesContext : DIContext
     {

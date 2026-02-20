@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace DependencyInjection
@@ -8,21 +9,21 @@ namespace DependencyInjection
     /// </summary>
     public class AutoInject : MonoBehaviour
     {
-        [SerializeField] private bool _injectOnAwake = true;
-        [SerializeField] private bool _injectChildren = false;
+        [SerializeField] private bool injectOnAwake = true;
+        [SerializeField] private bool injectChildren;
 
         private void Awake()
         {
-            if (_injectOnAwake)
+            if (injectOnAwake)
             {
-                Inject();
+                _= Inject();
             }
         }
 
         /// <summary>
         /// Injecte les dépendances manuellement (supporte automatiquement [InjectAsync])
         /// </summary>
-        public async void Inject()
+        private async Task Inject()
         {
             if (DIContext.Container == null)
             {
@@ -30,7 +31,7 @@ namespace DependencyInjection
                 return;
             }
 
-            if (_injectChildren)
+            if (injectChildren)
             {
                 var components = GetComponentsInChildren<MonoBehaviour>(true);
                 foreach (var component in components)

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection.Examples._04_Lifetimes
+namespace DependencyInjection.Samples._04_Lifetimes
 {
     public class LifetimesTest : MonoBehaviour
     {
@@ -33,22 +33,17 @@ namespace DependencyInjection.Examples._04_Lifetimes
 
         private void TestScoped()
         {
-            using (var scope = DIContext.Container.CreateScope())
-            {
-                var sc1 = scope.Resolve<IScopedService>();
-                var sc2 = scope.Resolve<IScopedService>();
+            using var scope = DIContext.Container.CreateScope();
+            var sc1 = scope.Resolve<IScopedService>();
+            var sc2 = scope.Resolve<IScopedService>();
 
-                bool pass = sc1.GetId() == sc2.GetId();
-                _logger.Log($"Scoped (same scope): {(pass ? "✓ PASS" : "✗ FAIL")} (IDs: {sc1.GetId()}, {sc2.GetId()})");
+            bool pass = sc1.GetId() == sc2.GetId();
+            _logger.Log($"Scoped (same scope): {(pass ? "✓ PASS" : "✗ FAIL")} (IDs: {sc1.GetId()}, {sc2.GetId()})");
 
-                using (var scope2 = DIContext.Container.CreateScope())
-                {
-                    var sc3 = scope2.Resolve<IScopedService>();
-                    bool pass2 = sc1.GetId() != sc3.GetId();
-                    _logger.Log($"Scoped (Different Scope): {(pass2 ? "✓ PASS" : "✗ FAIL")} (IDs: {sc1.GetId()}, {sc3.GetId()})");
-                }
-
-            }
+            using var scope2 = DIContext.Container.CreateScope();
+            var sc3 = scope2.Resolve<IScopedService>();
+            bool pass2 = sc1.GetId() != sc3.GetId();
+            _logger.Log($"Scoped (Different Scope): {(pass2 ? "✓ PASS" : "✗ FAIL")} (IDs: {sc1.GetId()}, {sc3.GetId()})");
         }
     }
 }

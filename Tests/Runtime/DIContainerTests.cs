@@ -1,8 +1,9 @@
-using NUnit.Framework;
 using System;
 using System.Linq;
+using DependencyInjection;
+using NUnit.Framework;
 
-namespace DependencyInjection.Tests
+namespace Tests.Runtime
 {
     [TestFixture]
     public class DIContainerTests

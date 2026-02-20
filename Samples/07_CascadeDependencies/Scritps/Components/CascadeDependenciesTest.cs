@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection.Examples._07_CascadeDependencies
+namespace DependencyInjection.Samples._07_CascadeDependencies
 {
     public class CascadeDependenciesTest : MonoBehaviour
     {
@@ -14,8 +14,8 @@ namespace DependencyInjection.Examples._07_CascadeDependencies
             if (_serviceA != null)
             {
                 string result = _serviceA.GetData();
-                _logger.Log($"✓ Cascade resolved: {result}");
-                _logger.Log("✓ Order: Logger → ServiceC → ServiceB → ServiceA");
+                _logger?.Log($"✓ Cascade resolved: {result}");
+                _logger?.Log("✓ Order: Logger → ServiceC → ServiceB → ServiceA");
             }
             else
             {

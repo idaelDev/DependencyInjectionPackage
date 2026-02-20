@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection.Examples._06_RuntimeInstantiation
+namespace DependencyInjection.Samples._06_RuntimeInstantiation
 {
     public class ConsoleLogger : ILogger
     {

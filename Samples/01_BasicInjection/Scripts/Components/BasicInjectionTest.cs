@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection.Examples._01_BasicInjection
+namespace DependencyInjection.Samples._01_BasicInjection
 {
     /// <summary>
     /// Test de l'injection de base : field et property
@@ -11,7 +11,7 @@ namespace DependencyInjection.Examples._01_BasicInjection
         [Inject] private ILogger _loggerField;
 
         // Test injection de property publique
-        [Inject] public ILogger LoggerProperty { get; private set; }
+        [Inject] public ILogger LoggerProperty { get; set; }
 
         private void Start()
         {

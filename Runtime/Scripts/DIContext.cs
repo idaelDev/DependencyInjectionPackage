@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace DependencyInjection
@@ -11,10 +12,10 @@ namespace DependencyInjection
         private static DIContext _instance;
         private DIContainer _container;
 
-        [SerializeField] private bool _dontDestroyOnLoad = true;
-        [SerializeField] private bool _injectOnAwake = true;
+        [SerializeField] private bool dontDestroyOnLoad = true;
+        [SerializeField] private bool injectOnAwake = true;
 
-        public static DIContext Instance
+        private static DIContext Instance
         {
             get
             {
@@ -39,7 +40,7 @@ namespace DependencyInjection
             if (_instance == null)
             {
                 _instance = this;
-                if (_dontDestroyOnLoad)
+                if (dontDestroyOnLoad)
                 {
                     DontDestroyOnLoad(gameObject);
                 }
@@ -52,9 +53,9 @@ namespace DependencyInjection
                 return;
             }
 
-            if (_injectOnAwake)
+            if (injectOnAwake)
             {
-                InjectSceneObjects();
+                _ = InjectSceneObjects();
             }
         }
 
@@ -76,7 +77,7 @@ namespace DependencyInjection
         /// <summary>
         /// Injecte les dépendances dans tous les MonoBehaviour de la scène
         /// </summary>
-        public async void InjectSceneObjects()
+        private async Task InjectSceneObjects()
         {
             var allMonoBehaviours = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             foreach (var behaviour in allMonoBehaviours)

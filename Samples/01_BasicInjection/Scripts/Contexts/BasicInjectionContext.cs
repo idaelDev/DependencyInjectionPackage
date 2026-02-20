@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection.Examples._01_BasicInjection
+namespace DependencyInjection.Samples._01_BasicInjection
 {
     public class BasicInjectionContext : DIContext
     {

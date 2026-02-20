@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection.Examples._05_Scopes
+namespace DependencyInjection.Samples._05_Scopes
 {
     public class ScopesTest : MonoBehaviour
     {
@@ -34,7 +34,7 @@ namespace DependencyInjection.Examples._05_Scopes
             {
                 var trans = scope.Resolve<ITransactionService>();
                 trans.BeginTransaction();
-                // Pas de commit - va rollback automatiquement
+                // Pas de commit – va rollback automatiquement
             }
 
             _logger.Log("✓ Auto rollback on dispose\n");

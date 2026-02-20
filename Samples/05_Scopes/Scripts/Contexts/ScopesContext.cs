@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection.Examples._05_Scopes
+namespace DependencyInjection.Samples._05_Scopes
 {
     public class ScopesContext : DIContext
     {

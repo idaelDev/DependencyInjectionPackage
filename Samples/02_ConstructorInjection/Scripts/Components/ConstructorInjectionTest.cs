@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection.Examples._02_ConstructorInjection
+namespace DependencyInjection.Samples._02_ConstructorInjection
 {
     public class ConstructorInjectionTest : MonoBehaviour
     {
@@ -34,7 +34,7 @@ namespace DependencyInjection.Examples._02_ConstructorInjection
         {
             // GameManager dépend de ILogger et IAudioService
             // Si ça fonctionne, c'est que les dépendances en cascade sont résolues
-            if (_gameManager != null && _gameManager.IsRunning)
+            if (_gameManager is { IsRunning: true })
             {
                 _logger.Log("✓ Cascade dependencies resolved correctly");
             }
