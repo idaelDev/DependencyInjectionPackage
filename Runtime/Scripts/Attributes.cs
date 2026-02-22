@@ -1,6 +1,6 @@
 using System;
 
-namespace DependencyInjection
+namespace IdaelDev.DependencyInjection
 {
     /// <summary>
     /// Marque un field, une propriété, un constructeur ou un paramètre pour l'injection de dépendances

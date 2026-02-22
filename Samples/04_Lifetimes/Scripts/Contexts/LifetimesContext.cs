@@ -1,3 +1,4 @@
+using IdaelDev.DependencyInjection;
 using UnityEngine;
 using ILogger = DependencyInjection.Samples._04_Lifetimes.ILogger;
 

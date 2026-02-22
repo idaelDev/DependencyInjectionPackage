@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace DependencyInjection
+namespace IdaelDev.DependencyInjection
 {
     public enum Lifetime
     {

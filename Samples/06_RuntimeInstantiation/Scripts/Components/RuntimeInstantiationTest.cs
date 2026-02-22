@@ -1,4 +1,5 @@
 using System.Collections;
+using IdaelDev.DependencyInjection;
 using UnityEngine;
 
 namespace DependencyInjection.Samples._06_RuntimeInstantiation

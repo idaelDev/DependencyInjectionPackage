@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace DependencyInjection
+namespace IdaelDev.DependencyInjection
 {
     /// <summary>
     /// Contexte global d'injection de dépendances pour Unity.

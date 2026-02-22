@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace DependencyInjection
+namespace IdaelDev.DependencyInjection
 {
     /// <summary>
     /// Composant qui injecte automatiquement les dépendances lors de l'instanciation d'un GameObject.

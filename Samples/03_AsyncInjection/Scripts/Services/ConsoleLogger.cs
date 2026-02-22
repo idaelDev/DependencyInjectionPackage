@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using IdaelDev.DependencyInjection;
+using UnityEngine;
 
 namespace DependencyInjection.Samples._03_AsyncInjection
 {

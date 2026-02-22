@@ -1,6 +1,6 @@
 {
     "name": "IdaelDev.Dependencyinjection.Tests",
-    "rootNamespace": "",
+    "rootNamespace": "IdaelDev.DependencyInjection",
     "references": [
         "GUID:9a5514540023d404182f9b48c97468bd",
         "GUID:27619889b8ba8c24980f49ee34dbb44a",

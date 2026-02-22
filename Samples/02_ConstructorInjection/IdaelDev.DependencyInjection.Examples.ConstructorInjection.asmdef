@@ -1,6 +1,6 @@
 {
     "name": "IdaelDev.DependencyInjection.Examples.ConstructorInjection",
-    "rootNamespace": "DependencyInjection",
+    "rootNamespace": "IdaelDev.DependencyInjection",
     "references": [
         "GUID:9a5514540023d404182f9b48c97468bd"
     ],

@@ -1,9 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using System.Linq;
-using System.Collections.Generic;
 
-namespace DependencyInjection.Editor
+namespace IdaelDev.DependencyInjection.Editor
 {
     public class DIContainerInspectorWindow : EditorWindow
     {

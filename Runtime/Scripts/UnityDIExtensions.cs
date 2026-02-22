@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection
+namespace IdaelDev.DependencyInjection
 {
     /// <summary>
     /// Extensions pour faciliter l'injection dans Unity

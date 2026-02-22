@@ -1,4 +1,4 @@
-namespace DependencyInjection.Samples._01_BasicInjection
+namespace IdaelDev.DependencyInjection.Samples._01_BasicInjection
 {
     public interface ILogger
     {

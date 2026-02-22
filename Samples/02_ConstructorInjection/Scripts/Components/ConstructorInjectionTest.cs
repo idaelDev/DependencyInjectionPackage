@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection.Samples._02_ConstructorInjection
+namespace IdaelDev.DependencyInjection.Samples._02_ConstructorInjection
 {
     public class ConstructorInjectionTest : MonoBehaviour
     {

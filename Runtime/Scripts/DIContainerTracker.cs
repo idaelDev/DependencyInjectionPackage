@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DependencyInjection
+namespace IdaelDev.DependencyInjection
 {
     /// <summary>
     /// Informations sur une instance créée par le container

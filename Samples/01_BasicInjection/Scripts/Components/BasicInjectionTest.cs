@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DependencyInjection.Samples._01_BasicInjection
+namespace IdaelDev.DependencyInjection.Samples._01_BasicInjection
 {
     /// <summary>
     /// Test de l'injection de base : field et property

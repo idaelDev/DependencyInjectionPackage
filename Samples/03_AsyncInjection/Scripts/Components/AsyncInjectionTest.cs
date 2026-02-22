@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using IdaelDev.DependencyInjection;
 using UnityEngine;
 
 namespace DependencyInjection.Samples._03_AsyncInjection
