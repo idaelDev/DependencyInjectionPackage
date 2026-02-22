@@ -387,7 +387,3 @@ Make sure DIContext is in the scene and initialized before use.
 - Make sure the `[Inject]` attribute is present  
 - For runtime GameObjects, use `AutoInject` or the extensions  
 - Ensure `InjectOnAwake` is enabled in DIContext  
-
-## License
-
-Free to use for your personal and commercial Unity projects.
