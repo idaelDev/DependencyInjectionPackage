@@ -2,7 +2,7 @@
     "name": "IdaelDev.Dependencyinjection.Editor",
     "rootNamespace": "IdaelDev.DependencyInjection.Editor",
     "references": [
-        "GUID:9a5514540023d404182f9b48c97468bd"
+        "IdaelDev.Dependencyinjection"
     ],
     "includePlatforms": [
         "Editor"
